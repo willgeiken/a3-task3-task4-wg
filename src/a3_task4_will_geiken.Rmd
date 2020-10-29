@@ -1,0 +1,90 @@
+---
+title: "Assignment 3 Task 4"
+author: "Will Geiken"
+date: "10/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lubridate)
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+
+urchin_data <- read.csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+```
+
+## Introduction
+
+In this document I will be 
+
+### 1. Wrangling
+
+Wrangle the data such that it only includes Naples Reef observations of purple urchins from January 2010.
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+purp_urch_jan_2010 <- urchin_data %>% 
+  filter(common_name == "Purple Urchin") %>% 
+  mutate(date = mdy(date)) %>% 
+  mutate(year = year(date)) %>%
+  mutate(month = month(date)) %>% 
+  filter(month == 1, year == 2010, site == "NAPL")
+```
+
+### 2. Visualization
+
+Create a histogram and Q-Q plot comparing the two treatment types 
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = purp_urch_jan_2010, aes(x = size)) +
+  geom_histogram(bins = 10) +
+  facet_wrap(~treatment)
+```
+Takeaways:
+
+Create a Q-Q plot comparing the two treament types
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = purp_urch_jan_2010, aes(sample = size)) +
+  geom_qq() +
+  facet_wrap(~treatment)
+```
+Takeaways:
+
+### Data table
+
+Create a data table that displays descriptive statistics for each group. Include mean, standard deviation, and sample size
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+urchin_table <- purp_urch_jan_2010 %>% 
+  group_by(treatment) %>% 
+  summarise("Mean Diameter (cm)" = mean(size),
+            "Median Diameter (cm)" = median(size),
+            "Standard Deviation (cm)" = sd(size),
+            "Sample Size" = n()) 
+
+kbl(urchin_table) %>% 
+  kable_styling()
+```
+
+### Perform a two-sample t-test to compare means between the two groups
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+annual_sample <- purp_urch_jan_2010 %>% 
+  filter(treatment == "ANNUAL") %>% 
+  pull(size)
+
+control_sample <- purp_urch_jan_2010 %>% 
+  filter(treatment == "CONTROL") %>% 
+  pull(size)
+
+t.test(x = annual_sample, y = control_sample)
+```
+
+### Discussion of Results
+
+
+### Meaning of the p-value
