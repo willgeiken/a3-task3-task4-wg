@@ -12,51 +12,56 @@ library(kableExtra)
 library(tidyverse)
 library(janitor)
 library(here)
-
-urchin_data <- read.csv(here("data", "urchins.csv")) %>% 
-  clean_names()
 ```
 
 ## Introduction
 
-In this document I will be 
+In this document I will be further exploring the urchins data set to practice wrangling, data visualization, analysis, version control, and project management. More specifically, I will be practicing the recommended steps for analyzing whether a two-subject t-test is appropriate as well as actually conducting a two-subject t-test.
 
 ### 1. Wrangling
 
 Wrangle the data such that it only includes Naples Reef observations of purple urchins from January 2010.
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
+urchin_data <- read.csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+#read in the data and modify column names to lower_snake_case
+
 purp_urch_jan_2010 <- urchin_data %>% 
   filter(common_name == "Purple Urchin") %>% 
   mutate(date = mdy(date)) %>% 
   mutate(year = year(date)) %>%
   mutate(month = month(date)) %>% 
   filter(month == 1, year == 2010, site == "NAPL")
+#create a subset of the data containing only purple urchins, update the date column to be "Date" class, add a year column, add a month column, and then filter the data to only include observations from January 2010 at the Naples Reef site.
 ```
 
 ### 2. Visualization
 
-Create a histogram and Q-Q plot comparing the two treatment types 
+Create a histogram and Q-Q plot comparing the two treatment types. 
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = purp_urch_jan_2010, aes(x = size)) +
-  geom_histogram(bins = 10) +
+  geom_histogram(bins = 15) +
   facet_wrap(~treatment)
+#plot the data with size on the x-axis, create histograms with 15 bins for clarity, and use facet_wrap to separate by treatment
 ```
 Takeaways:
+The two plots are fairly similar in spread, although none of the control group reached a diameter of 6 cm. The annual group appears slightly more uniform in distribution across sizes, while the control group appears to have a stronger central tendency. However, it's possilbe that both groups are still normally distributed.
 
-Create a Q-Q plot comparing the two treament types
+Create a Q-Q plot comparing the two treament types.
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = purp_urch_jan_2010, aes(sample = size)) +
   geom_qq() +
   facet_wrap(~treatment)
+#plot the data according to size, create a Q-Q plot, and separate according to treatment.
 ```
-Takeaways:
+Takeaways: Both of the Q-Q plots follow more-or-less linear trends. There are a few outliers on the low end of both groups and maybe another at the high end of the control group, but the linear relationship still suggests that both groups have normally distributed samples.
 
 ### Data table
 
-Create a data table that displays descriptive statistics for each group. Include mean, standard deviation, and sample size
+Create a data table that displays descriptive statistics for each group. Include mean, standard deviation, and sample size.
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 urchin_table <- purp_urch_jan_2010 %>% 
@@ -68,6 +73,7 @@ urchin_table <- purp_urch_jan_2010 %>%
 
 kbl(urchin_table) %>% 
   kable_styling()
+#create a new subset that will show statistics; group the data by treatment to separate the two groups; calculate the mean, median, standard deviation, and sample size for both species; and format the table
 ```
 
 ### Perform a two-sample t-test to compare means between the two groups
@@ -76,15 +82,19 @@ kbl(urchin_table) %>%
 annual_sample <- purp_urch_jan_2010 %>% 
   filter(treatment == "ANNUAL") %>% 
   pull(size)
+#create a vector from the data that filters only urchins from the "ANNUAL" group, and pull the size of each of those urchins
 
 control_sample <- purp_urch_jan_2010 %>% 
   filter(treatment == "CONTROL") %>% 
   pull(size)
+#create a vector from the data that filters only urchins from the "CONTROL" group, and pull the size of each of those urchins
 
 t.test(x = annual_sample, y = control_sample)
+#conduct a two-sample t-test of the vectors
 ```
 
 ### Discussion of Results
-
+The means of both groups are relatively close (3.916667 cm for the annual treatment group and 3.725806 cm for the control group), with the annual treatment group having a higher mean diameter by 0.190861 cm. Considering that the urchins were measured to the nearest half centimeter, drawing any conclusions about how treatment affects size seems irresponsible. This is further supported by the standard deviations for each group (0.9662380 for the annual treatment and 0.8668646 for the control group), which show that the mean of each group is within one standard deviation of the other mean. So, while there was a difference in the mean diameter of both groups, we cannot responsibly conclude that it is because of the difference in treatment.
 
 ### Meaning of the p-value
+Our p-value tells us that if these samples were selected from populations with the same mean, there is a 25.36% chance that these samples would have ended up having the difference in means that we found. That is well above zero, which means that it is entirely possible that these samples were selected from populations with the same mean, and we cannot reject our null hypothesis.
