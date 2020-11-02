@@ -609,7 +609,7 @@ summary {
 urchin_exploration &lt;- urchin_data %&gt;% 
   select(size, common_name) 
 #create a subset of the data containing only the variables that I will use for visualization</code></pre>
-<p>First I will make faceted histograms to see the frequency and spread for sizes of both types of urchins</p>
+<p>First I will make faceted histograms to see the frequency and spread of size for both types of urchins</p>
 <pre class="r"><code>ggplot(data = urchin_exploration, aes(x = size)) +
   geom_histogram(bins = 25) +
   facet_wrap(~common_name)+
@@ -694,7 +694,7 @@ Red Urchin
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>#create a new subset that will show statistics; group the data by common_name to separate the species; calculate the mean, median, standard deviation, and sample size for both species; and format the table</code></pre>
+<pre class="r"><code>#create a new subset that will show statistics; group the data by common_name to separate the species; calculate the mean, median, standard deviation, and sample size for both species; and format the table for clarity/visual appeal</code></pre>
 </div>
 <div id="c.-overall-takeaways" class="section level3">
 <h3>C. Overall takeaways</h3>
@@ -705,7 +705,7 @@ Red Urchin
 <h2>Section 2: Explore purple urchin counts by site and year</h2>
 <div id="a.-create-a-subset-of-the-data-called-purple_urchins" class="section level3">
 <h3>A. Create a subset of the data called purple_urchins:</h3>
-<p>In the subset I will -Filter to only include observations for purple urchins -Convert the date to class “Date” -Create a new column that only contains the year -Create a new column called site_full that contains the full name</p>
+<p>In the subset I will -Filter to only include observations for purple urchins -Convert the date to class “Date” -Create a new column that only contains the year -Create a new column called site_full that contains the full name of the sampling site</p>
 <pre class="r"><code>purple_urchins &lt;- urchin_data %&gt;% 
   filter(common_name == &quot;Purple Urchin&quot;) %&gt;% 
   mutate(date = mdy(date)) %&gt;% 

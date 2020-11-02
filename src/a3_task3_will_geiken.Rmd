@@ -33,7 +33,7 @@ urchin_exploration <- urchin_data %>%
 ```
 
 
-First I will make faceted histograms to see the frequency and spread for sizes of both types of urchins
+First I will make faceted histograms to see the frequency and spread of size for both types of urchins
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 
@@ -69,7 +69,7 @@ urchin_stats <- urchin_exploration %>%
 
 kbl(urchin_stats) %>% 
   kable_styling()
-#create a new subset that will show statistics; group the data by common_name to separate the species; calculate the mean, median, standard deviation, and sample size for both species; and format the table
+#create a new subset that will show statistics; group the data by common_name to separate the species; calculate the mean, median, standard deviation, and sample size for both species; and format the table for clarity/visual appeal
 ```
 
 ### C. Overall takeaways
@@ -84,7 +84,7 @@ In the subset I will
 -Filter to only include observations for purple urchins
 -Convert the date to class “Date” 
 -Create a new column that only contains the year
--Create a new column called site_full that contains the full name 
+-Create a new column called site_full that contains the full name of the sampling site
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 purple_urchins <- urchin_data %>% 
